@@ -90,3 +90,4 @@ ENV/
 
 data.zip
 *.jpg
+__MACOSX/
