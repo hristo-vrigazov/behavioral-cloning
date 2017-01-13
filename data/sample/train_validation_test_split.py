@@ -34,5 +34,5 @@ def create_folder_if_does_not_exist(folder):
 for dataset in folders:
 	create_folder_if_does_not_exist(dataset)
 	path_to_driving_log_dataset = '{}/driving_log.csv'.format(folders[dataset])
-	dataframes[dataset].to_csv(path_to_driving_log_dataset)
+	dataframes[dataset].to_csv(path_to_driving_log_dataset, index=False)
 	copy_images(PATH_TO_DATA, folders[dataset], path_to_driving_log_dataset)
