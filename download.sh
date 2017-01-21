@@ -1,2 +1,2 @@
-wget https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip &&
-unzip data.zip
+wget https://www.dropbox.com/s/zz99mfxvwibc07t/all_data.zip &&
+unzip all_data.zip
