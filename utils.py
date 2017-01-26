@@ -18,12 +18,13 @@ def get_driving_log_dataframe(data_folder):
 def get_steering_df_in_range(df, start, end):
 	return df[df['steering'] >= start][df['steering'] <= end]
 
-def convert_data_to_classification(data_folder):
+
+def describe_data(data_folder):
 	driving_log_df = get_driving_log_dataframe(data_folder)
 	images_folder = img_folder(data_folder)
 	class_ranges = np.linspace(-1, 1, 20)
 
 	for first, second in zip(class_ranges, class_ranges[1:]):
 		df_steering_in_range = get_steering_df_in_range(driving_log_df, first, second)
-		print(len(df_steering_in_range))
+		print("Between {0} and {1}, there are {2}".format(first, second, len(df_steering_in_range)))
 
