@@ -10,10 +10,14 @@ class AbstractPipeline(object):
     def get_model(self):
         raise NotImplementedError
 
-
     def preprocess_image(self, image):
         raise NotImplementedError
 
+    def get_train_generator(self, data_folder, batch_size=64):
+        raise NotImplementedError
+
+    def get_validation_generator(self, data_folder, batch_size=64):
+        raise NotImplementedError
 
     def get_weight(self, label):
         return 1

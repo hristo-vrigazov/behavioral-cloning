@@ -23,6 +23,14 @@ class NvidiaPipeLine(AbstractPipeline):
         image = image.convert('YCbCr')
         image_np = np.asarray(image.resize(self.input_resize_to))
         return image_np
+
+
+    def get_train_generator(self, data_folder, batch_size=64):
+        return self.get_left_center_right_generator(data_folder, batch_size)
+
+
+    def get_validation_generator(self, data_folder, batch_size=64):
+        return self.get_center_only_generator(data_folder, batch_size)
         
 
     def get_model(self):

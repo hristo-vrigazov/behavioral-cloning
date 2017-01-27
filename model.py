@@ -16,8 +16,8 @@ def train(data_folder, validation_folder):
     model.compile("adam", "mse")
     model.summary()
 
-    image_generator = pipeline.get_left_center_right_generator(data_folder)
-    validation_generator = pipeline.get_center_only_generator(validation_folder)
+    image_generator = pipeline.get_train_generator(data_folder)
+    validation_generator = pipeline.get_validation_generator(validation_folder)
     samples = len(get_driving_log_dataframe(data_folder)) * 3 * 2
     nb_val_samples = len(get_driving_log_dataframe(validation_folder))
     callbacks_list = get_callbacks()
