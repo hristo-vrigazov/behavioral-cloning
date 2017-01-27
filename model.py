@@ -1,3 +1,5 @@
+import sys
+
 from models.nvidia_pipeline import NvidiaPipeLine
 
 from utils import get_driving_log_dataframe
@@ -38,4 +40,5 @@ def train(data_folder, validation_folder):
 
     model.save_weights('model.h5')
 
-train('data', 'valid')
+if __name__ == "__main__":
+    train(sys.argv[1], sys.argv[2])
