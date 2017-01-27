@@ -14,9 +14,14 @@ import numpy as np
 
 class NvidiaPipeLine(AbstractPipeline):
 
+    def __init__(self):
+        self.input_shape = (66, 200, 3)
+        self.input_resize_to = (200, 66)
+
+
     def preprocess_image(self, image):
         image = image.convert('YCbCr')
-        image_np = np.asarray(image.resize((200, 66)))
+        image_np = np.asarray(image.resize(self.input_resize_to))
         return image_np
         
 
@@ -26,7 +31,7 @@ class NvidiaPipeLine(AbstractPipeline):
         regularization_coef = 10e-7
 
         model.add(Lambda(lambda x: x/255.0,
-                    input_shape=input_shape))
+                    input_shape=self.input_shape))
         model.add(Convolution2D(24, 
                                 5, 5,
                                subsample=(2, 2),

@@ -1,3 +1,10 @@
+import pandas as pd
+import numpy as np
+import cv2
+
+from PIL import Image
+from sklearn.utils import shuffle
+
 class AbstractPipeline(object):
 
     def get_model(self):
@@ -11,10 +18,18 @@ class AbstractPipeline(object):
     def get_weight(self, label):
         return 1
 
+    def path_driving_log(self, data_folder):
+        return '{}/driving_log.csv'.format(data_folder)
+
+
+    def get_driving_log_dataframe(self, data_folder):
+        driving_log_df = pd.read_csv(self.path_driving_log(data_folder))
+        return driving_log_df
+
     # generator for dataframes that have left, center and right
     # as opposed to
     def get_left_center_right_generator(self, data_folder, batch_size=64):
-        driving_log_df = get_driving_log_dataframe(data_folder)
+        driving_log_df = self.get_driving_log_dataframe(data_folder)
         number_of_examples = len(driving_log_df)
         image_columns = ['center', 'left', 'right']
         
@@ -70,8 +85,10 @@ class AbstractPipeline(object):
 
 
     def get_center_only_generator(self, data_folder, batch_size=64):
-        driving_log_df = get_driving_log_dataframe(data_folder)
+        driving_log_df = self.get_driving_log_dataframe(data_folder)
         number_of_examples = len(driving_log_df)
+
+        print(driving_log_df.head())
         
         X_train = []
         y_train = []

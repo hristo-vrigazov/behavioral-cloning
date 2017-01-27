@@ -2,6 +2,8 @@ import sys
 import pandas as pd
 import numpy as np
 
+from keras.callbacks import ModelCheckpoint
+
 def img_folder(data_folder):
     return '{}/IMG'.format(data_folder)
 
@@ -27,4 +29,11 @@ def describe_data(data_folder):
 	for first, second in zip(class_ranges, class_ranges[1:]):
 		df_steering_in_range = get_steering_df_in_range(driving_log_df, first, second)
 		print("Between {0} and {1}, there are {2}".format(first, second, len(df_steering_in_range)))
+
+
+def get_callbacks():
+	filepath = "weights-{epoch:02d}.h5"
+	checkpoint = ModelCheckpoint(filepath)
+	callbacks_list = [checkpoint]
+	return callbacks_list
 
