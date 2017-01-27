@@ -4,6 +4,7 @@ from models.nvidia_pipeline import NvidiaPipeLine
 
 from utils import get_driving_log_dataframe
 from utils import get_callbacks
+from keras.models import load_model
 # Instead of implementing here, the model is in the
 # models/ directory, because this allows to quickly
 # switch between different pipelines
@@ -13,10 +14,15 @@ def preprocess(image):
     return pipeline.preprocess_image(image)
 
 
-def train(data_folder, validation_folder):
-    model = pipeline.get_model()
+def train(data_folder, validation_folder, restart_model_path=None):
+    if restart_model_path:
+        model = load_model(restart_model_path)
+        print("Using existing model")
+    else:
+        model = pipeline.get_model()
+        model.compile("adam", "mse")
+        print("Using new model")
 
-    model.compile("adam", "mse")
     model.summary()
 
     image_generator = pipeline.get_train_generator(data_folder)
@@ -41,4 +47,9 @@ def train(data_folder, validation_folder):
     model.save_weights('model.h5')
 
 if __name__ == "__main__":
-    train(sys.argv[1], sys.argv[2])
+    if len(sys.argv) < 3:
+        print('Usage: python model.py train_folder valid_folder [exising_model_to_finetune]')
+    elif len(sys.argv) < 4:
+        train(sys.argv[1], sys.argv[2])
+    else:
+        train(sys.argv[1], sys.argv[2], sys.argv[3])
