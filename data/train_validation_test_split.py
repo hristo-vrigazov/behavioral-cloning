@@ -12,9 +12,9 @@ PATH_TO_DRIVING_LOG = '{}/driving_log.csv'.format(PATH_TO_DATA)
 
 driving_log_df = pd.read_csv(PATH_TO_DRIVING_LOG)
 
-train_df, test_df =  train_test_split(driving_log_df, test_size = 0.2)
+train_df, test_df =  train_test_split(driving_log_df, test_size = 0.1)
 
-train_df, validation_df = train_test_split(train_df, test_size = 0.2)
+train_df, validation_df = train_test_split(train_df, test_size = 0.1)
 
 print(len(train_df))
 print(len(test_df))
