@@ -19,6 +19,14 @@ class NvidiaPipeLine(AbstractPipeline):
         self.input_resize_to = (200, 66)
 
 
+    def get_train_samples(self, df):
+        return len(df) * 3 * 2
+
+
+    def get_validation_samples(self, df):
+        return len(df)
+
+
     def preprocess_image(self, image):
         image = image.convert('YCbCr')
         image_np = np.asarray(image.resize(self.input_resize_to))

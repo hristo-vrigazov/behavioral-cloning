@@ -19,6 +19,12 @@ class AbstractPipeline(object):
     def get_validation_generator(self, data_folder, batch_size=64):
         raise NotImplementedError
 
+    def get_train_samples(self, df):
+        raise NotImplementedError
+
+    def get_validation_samples(self, df):
+        raise NotImplementedError
+
     def get_weight(self, label):
         return 1
 
