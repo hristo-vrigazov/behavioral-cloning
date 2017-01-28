@@ -27,7 +27,7 @@ class AbstractPipeline(object):
         raise NotImplementedError
 
     def get_weight(self, label):
-        return math.exp(abs(label) * 2)
+        return 1 #math.exp(abs(label) * 2)
 
     def path_driving_log(self, data_folder):
         return '{}/driving_log.csv'.format(data_folder)
@@ -70,7 +70,6 @@ class AbstractPipeline(object):
                         image = Image.open('{0}/{1}'.format(data_folder, image_filename))
                         image_np = self.preprocess_image(image)
                         label = steering_series[j]
-                        
                         if image_column == 'left':
                             delta_steering = -angle_offset
                         elif image_column == 'right':
