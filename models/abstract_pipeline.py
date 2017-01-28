@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import cv2
+import math
 
 from PIL import Image
 from sklearn.utils import shuffle
@@ -26,7 +27,7 @@ class AbstractPipeline(object):
         raise NotImplementedError
 
     def get_weight(self, label):
-        return 1
+        return math.exp(abs(label) * 2)
 
     def path_driving_log(self, data_folder):
         return '{}/driving_log.csv'.format(data_folder)

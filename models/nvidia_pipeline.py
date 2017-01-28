@@ -15,8 +15,8 @@ import numpy as np
 class NvidiaPipeLine(AbstractPipeline):
 
     def __init__(self):
-        self.input_shape = (66, 200, 3)
-        self.input_resize_to = (200, 66)
+        self.input_shape = (60, 80, 3)
+        self.input_resize_to = (80, 60)
 
 
     def get_train_samples(self, df):
@@ -30,6 +30,7 @@ class NvidiaPipeLine(AbstractPipeline):
     def preprocess_image(self, image):
         image = image.convert('YCbCr')
         image_np = np.asarray(image.resize(self.input_resize_to))
+#        image_np = np.asarray(image)
         return image_np
 
 
@@ -44,24 +45,24 @@ class NvidiaPipeLine(AbstractPipeline):
     def get_model(self):
         model = Sequential()
 
-        regularization_coef = 10e-7
+        regularization_coef = 10e-8
 
         model.add(Lambda(lambda x: x/255.0,
                     input_shape=self.input_shape))
         model.add(Convolution2D(24, 
-                                5, 5,
+                                3, 3,
                                subsample=(2, 2),
                                init='he_normal',
                                W_regularizer=l2(regularization_coef), activity_regularizer=activity_l2(regularization_coef)))
         model.add(BatchNormalization())
         model.add(Convolution2D(36, 
-                                5, 5,
+                                3, 3,
                                subsample=(2, 2),
                                init='he_normal',
                                W_regularizer=l2(regularization_coef), activity_regularizer=activity_l2(regularization_coef)))
         model.add(BatchNormalization())
         model.add(Convolution2D(48, 
-                                5, 5,
+                                3, 3,
                                subsample=(2, 2),
                                init='he_normal',
                                W_regularizer=l2(regularization_coef), activity_regularizer=activity_l2(regularization_coef)))
@@ -88,3 +89,4 @@ class NvidiaPipeLine(AbstractPipeline):
         return model
         
    
+
