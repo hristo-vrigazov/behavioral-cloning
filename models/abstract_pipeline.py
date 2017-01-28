@@ -40,6 +40,7 @@ class AbstractPipeline(object):
     # as opposed to
     def get_left_center_right_generator(self, data_folder, batch_size=64):
         driving_log_df = self.get_driving_log_dataframe(data_folder)
+        driving_log_df = driving_log_df.reindex(np.random.permutation(driving_log_df.index))
         number_of_examples = len(driving_log_df)
         image_columns = ['center', 'left', 'right']
         
@@ -96,6 +97,7 @@ class AbstractPipeline(object):
 
     def get_center_only_generator(self, data_folder, batch_size=64):
         driving_log_df = self.get_driving_log_dataframe(data_folder)
+        driving_log_df = driving_log_df.reindex(np.random.permutation(driving_log_df.index))
         number_of_examples = len(driving_log_df)
 
         print(driving_log_df.head())
