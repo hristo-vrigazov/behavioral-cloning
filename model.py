@@ -1,6 +1,7 @@
 import sys
 
 from models.nvidia_pipeline import NvidiaPipeLine
+from models.vgg_pipeline import VGGPipeline
 
 from utils import get_driving_log_dataframe
 from utils import get_callbacks
@@ -8,7 +9,7 @@ from keras.models import load_model
 # Instead of implementing here, the model is in the
 # models/ directory, because this allows to quickly
 # switch between different pipelines
-pipeline = NvidiaPipeLine()
+pipeline = VGGPipeline()
 
 def preprocess(image):
     return pipeline.preprocess_image(image)
@@ -33,7 +34,7 @@ def train(data_folder, validation_folder, restart_model_path=None):
 
     model.fit_generator(image_generator, 
                         samples_per_epoch=samples, 
-                        nb_epoch=20,
+                        nb_epoch=1,
                        callbacks=callbacks_list,
                        validation_data=validation_generator,
                        nb_val_samples=nb_val_samples)
