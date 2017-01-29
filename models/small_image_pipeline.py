@@ -7,6 +7,8 @@ from keras.layers import Flatten
 from keras.layers import Dropout
 from keras.layers import Lambda
 
+from scipy.misc import imread, imresize
+
 from .abstract_pipeline import AbstractPipeline
 
 from keras.regularizers import l2, activity_l2
@@ -16,7 +18,7 @@ import numpy as np
 class SmallImagePipeline(AbstractPipeline):
 
     def __init__(self):
-        self.input_shape = (16, 32, 3)
+        self.input_shape = (16, 32, 1)
         self.input_resize_to = (32, 16)
 
 
@@ -24,15 +26,23 @@ class SmallImagePipeline(AbstractPipeline):
         return len(df) * 3 * 2
 
 
+    def rgb2gray(self, img):
+        grayed = np.mean(img, axis=2, keepdims=True)
+        return grayed
+
+    def normalize(self, img):
+        return img / (255.0 / 2) - 1
+
+
     def get_validation_samples(self, df):
         return len(df)
-
+    
 
     def preprocess_image(self, image):
-        #image = image.convert('L')
-        image_np = np.asarray(image.resize(self.input_resize_to))
-#        image_np = np.asarray(image)
-#        image_np = np.reshape(image_np, (16, 32, 1))
+        image_np = np.asarray(image)
+        image_np = imresize(image_np, (32, 16, 3))
+        image_np = self.rgb2gray(image_np)
+        image_np = self.normalize(image_np)
         return image_np
 
 
@@ -45,16 +55,17 @@ class SmallImagePipeline(AbstractPipeline):
         
 
     def get_model(self):
-        model = Sequential()
-        model.add(Conv2D(16, 3, 3, input_shape=self.input_shape, border_mode='same', activation='relu'))
-        model.add(Conv2D(32, 3, 3, border_mode='same', activation='relu'))
-        model.add(Dropout(0.5))
-        model.add(Conv2D(64, 3, 3, border_mode='same', activation='relu'))
-        model.add(Conv2D(128, 3, 3, border_mode='same', activation='relu'))
-        model.add(Dropout(0.5))
-        model.add(Flatten())
-        model.add(Dense(1024, activation='relu'))
-        model.add(Dense(512, activation='relu'))
-        model.add(Dense(128, activation='relu'))
-        model.add(Dense(1))
+        model = Sequential([
+            Conv2D(32, 3, 3, input_shape=(32, 16, 1), border_mode='same', activation='relu'),
+            Conv2D(64, 3, 3, border_mode='same', activation='relu'),
+            Dropout(0.5),
+            Conv2D(128, 3, 3, border_mode='same', activation='relu'),
+            Conv2D(256, 3, 3, border_mode='same', activation='relu'),
+            Dropout(0.5),
+            Flatten(),
+            Dense(1024, activation='relu'),
+            Dense(512, activation='relu'),
+            Dense(128, activation='relu'),
+            Dense(1, name='output', activation='tanh'),
+        ])
         return model

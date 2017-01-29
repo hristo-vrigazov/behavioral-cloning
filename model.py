@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.utils import shuffle
 from models.nvidia_pipeline import NvidiaPipeLine
 from models.vgg_pipeline import VGGPipeline
+from models.small_image_pipeline import SmallImagePipeline
 
 from PIL import Image
 from utils import get_driving_log_dataframe
@@ -14,9 +15,9 @@ from keras.models import load_model
 # Instead of implementing here, the model is in the
 # models/ directory, because this allows to quickly
 # switch between different pipelines
-pipeline = NvidiaPipeLine()
+pipeline = SmallImagePipeline()
 
-BATCH_SIZE = 16
+BATCH_SIZE = 1
 EPOCHS = 5
 
 def preprocess(image):
@@ -50,7 +51,7 @@ def get_preprocessed_dataframe(data_folder, batch_size=64):
                y_train.append(label)
                weights.append(1)
                     
-               flipped_image = cv2.flip(image_np, 1)
+               flipped_image = np.fliplr(image_np)
                flipped_label = -label
                     
                X_train.append(flipped_image) 

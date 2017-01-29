@@ -83,7 +83,7 @@ class AbstractPipeline(object):
                         y_train.append(label)
                         weights.append(self.get_weight(label))
                         
-                        flipped_image = cv2.flip(image_np, 1)
+                        flipped_image = np.fliplr(image_np)
                         flipped_label = -label
                         
                         X_train.append(flipped_image)
@@ -131,7 +131,7 @@ class AbstractPipeline(object):
                     y_train.append(label)
                     weights.append(self.get_weight(label))
 
-                    flipped_image = cv2.flip(image_np, 1)
+                    flipped_image = np.fliplr(image_np)
                     flipped_label = -label
 
                     X_train.append(flipped_image)
