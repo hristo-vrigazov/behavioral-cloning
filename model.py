@@ -18,7 +18,7 @@ from keras.models import load_model
 pipeline = SmallImagePipeline()
 
 BATCH_SIZE = 16
-EPOCHS = 2
+EPOCHS = 3
 
 def preprocess(image):
     return pipeline.preprocess_image(image)

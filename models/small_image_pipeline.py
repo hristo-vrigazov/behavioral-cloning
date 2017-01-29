@@ -6,6 +6,8 @@ from keras.layers import Conv2D
 from keras.layers import Flatten
 from keras.layers import Dropout
 from keras.layers import Lambda
+from keras.layers import MaxPooling2D
+from keras.layers.advanced_activations import ELU
 
 from scipy.misc import imread, imresize
 
@@ -18,8 +20,8 @@ import numpy as np
 class SmallImagePipeline(AbstractPipeline):
 
     def __init__(self):
-        self.input_shape = (16, 32, 1)
-        self.input_resize_to = (16, 32)
+        self.input_shape = (64, 64, 3)
+        self.input_resize_to = (64, 64)
 
 
     def get_train_samples(self, df):
@@ -52,7 +54,7 @@ class SmallImagePipeline(AbstractPipeline):
         if toss <= .25:
           image_np = self.add_random_shadow(image_np)
 
-        image_np = self.rgb2gray(image_np)
+#        image_np = self.rgb2gray(image_np)
         image_np = self.normalize(image_np)
         return image_np
 
@@ -66,17 +68,36 @@ class SmallImagePipeline(AbstractPipeline):
         
 
     def get_model(self):
-        model = Sequential([
-            Conv2D(32, 3, 3, input_shape=(32, 16, 1), border_mode='same', activation='relu'),
-            Conv2D(64, 3, 3, border_mode='same', activation='relu'),
-            Dropout(0.5),
-            Conv2D(128, 3, 3, border_mode='same', activation='relu'),
-            Conv2D(256, 3, 3, border_mode='same', activation='relu'),
-            Dropout(0.5),
-            Flatten(),
-            Dense(1024, activation='relu'),
-            Dense(512, activation='relu'),
-            Dense(128, activation='relu'),
-            Dense(1, name='output', activation='tanh'),
-        ])
+        model = Sequential()
+    # model.add(Lambda(preprocess_batch, input_shape=(160, 320, 3), output_shape=(64, 64, 3)))
+
+    # layer 1 output shape is 32x32x32
+        model.add(Convolution2D(32, 5, 5, input_shape=(64, 64, 3), subsample=(2, 2), border_mode="same"))
+        model.add(ELU())
+
+    # layer 2 output shape is 15x15x16
+        model.add(Convolution2D(16, 3, 3, subsample=(1, 1), border_mode="valid"))
+        model.add(ELU())
+        model.add(Dropout(.4))
+        model.add(MaxPooling2D((2, 2), border_mode='valid'))
+
+    # layer 3 output shape is 12x12x16
+        model.add(Convolution2D(16, 3, 3, subsample=(1, 1), border_mode="valid"))
+        model.add(ELU())
+        model.add(Dropout(.4))
+
+    # Flatten the output
+        model.add(Flatten())
+
+    # layer 4
+        model.add(Dense(1024))
+        model.add(Dropout(.3))
+        model.add(ELU())
+
+    # layer 5
+        model.add(Dense(512))
+        model.add(ELU())
+
+    # Finally a single output, since this is a regression problem
+        model.add(Dense(1))
         return model
