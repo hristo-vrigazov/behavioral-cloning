@@ -20,8 +20,8 @@ import numpy as np
 class SmallImagePipeline(AbstractPipeline):
 
     def __init__(self):
-        self.input_shape = (32, 32, 3)
-        self.input_resize_to = (32, 32)
+        self.input_shape = (48, 48, 3)
+        self.input_resize_to = (48, 48)
 
 
     def get_train_samples(self, df):
@@ -70,15 +70,15 @@ class SmallImagePipeline(AbstractPipeline):
     def get_model(self):
         model = Sequential()
 
-        model.add(Convolution2D(32, 3, 3, input_shape=self.input_shape, subsample=(2, 2), border_mode="same"))
+        model.add(Convolution2D(16, 3, 3, input_shape=self.input_shape, subsample=(2, 2), border_mode="same"))
         model.add(ELU())
 
-        model.add(Convolution2D(16, 3, 3, subsample=(1, 1), border_mode="valid"))
+        model.add(Convolution2D(32, 3, 3, subsample=(1, 1), border_mode="valid"))
         model.add(ELU())
         model.add(Dropout(.4))
         model.add(MaxPooling2D((2, 2), border_mode='valid'))
 
-        model.add(Convolution2D(16, 3, 3, subsample=(1, 1), border_mode="valid"))
+        model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode="valid"))
         model.add(ELU())
         model.add(Dropout(.4))
 
