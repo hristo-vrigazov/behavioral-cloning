@@ -73,7 +73,7 @@ class SmallImagePipeline(AbstractPipeline):
         model.add(Convolution2D(16, 5, 5, input_shape=self.input_shape, subsample=(2, 2), border_mode="same"))
         model.add(ELU())
 
-        model.add(Convolution2D(32, 3, 3, subsample=(1, 1), border_mode="valid"))
+        model.add(Convolution2D(16, 3, 3, subsample=(1, 1), border_mode="valid"))
         model.add(ELU())
         model.add(Dropout(.5))
         model.add(MaxPooling2D((2, 2), border_mode='valid'))
