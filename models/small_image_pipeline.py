@@ -19,7 +19,7 @@ class SmallImagePipeline(AbstractPipeline):
 
     def __init__(self):
         self.input_shape = (16, 32, 1)
-        self.input_resize_to = (32, 16)
+        self.input_resize_to = (16, 32)
 
 
     def get_train_samples(self, df):
@@ -40,7 +40,18 @@ class SmallImagePipeline(AbstractPipeline):
 
     def preprocess_image(self, image):
         image_np = np.asarray(image)
-        image_np = imresize(image_np, (32, 16, 3))
+        image_np = self.crop(image_np)
+        image_np = self.resize(image_np, self.input_resize_to)
+
+        # 1 in 4 images will be with augmented brightness
+        toss = np.random.random()
+        if toss <= .25:
+          image_np = self.augment_brightness_camera_images(image_np)
+
+        toss = np.random.random()
+        if toss <= .25:
+          image_np = self.add_random_shadow(image_np)
+
         image_np = self.rgb2gray(image_np)
         image_np = self.normalize(image_np)
         return image_np

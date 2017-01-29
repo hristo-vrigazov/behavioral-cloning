@@ -32,6 +32,45 @@ class AbstractPipeline(object):
     def path_driving_log(self, data_folder):
         return '{}/driving_log.csv'.format(data_folder)
 
+    # Credits to 
+    # https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.xneaoqiwj
+    def augment_brightness_camera_images(self, image):
+        image1 = cv2.cvtColor(image,cv2.COLOR_RGB2HSV)
+        random_bright = .25+np.random.uniform()
+        image1[:,:,2] = image1[:,:,2]*random_bright
+        image1 = cv2.cvtColor(image1,cv2.COLOR_HSV2RGB)
+        return image1
+
+    # Credits to 
+    # https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.xneaoqiwj
+    def add_random_shadow(self, image):
+        top_y = 320*np.random.uniform()
+        top_x = 0
+        bot_x = 160
+        bot_y = 320*np.random.uniform()
+        image_hls = cv2.cvtColor(image,cv2.COLOR_RGB2HLS)
+        shadow_mask = 0*image_hls[:,:,1]
+        X_m = np.mgrid[0:image.shape[0],0:image.shape[1]][0]
+        Y_m = np.mgrid[0:image.shape[0],0:image.shape[1]][1]
+        shadow_mask[((X_m-top_x)*(bot_y-top_y) -(bot_x - top_x)*(Y_m-top_y) >=0)]=1
+        #random_bright = .25+.7*np.random.uniform()
+        if np.random.randint(2)==1:
+            random_bright = .5
+            cond1 = shadow_mask==1
+            cond0 = shadow_mask==0
+            if np.random.randint(2)==1:
+                image_hls[:,:,1][cond1] = image_hls[:,:,1][cond1]*random_bright
+            else:
+                image_hls[:,:,1][cond0] = image_hls[:,:,1][cond0]*random_bright    
+        image = cv2.cvtColor(image_hls,cv2.COLOR_HLS2RGB)
+        return image
+
+    def crop(self, image):
+        cropped_image = image[50:, :, :]
+        return cropped_image
+
+    def resize(self, image, new_shape):
+        return cv2.resize(image, new_shape)
 
     def get_driving_log_dataframe(self, data_folder):
         driving_log_df = pd.read_csv(self.path_driving_log(data_folder))
