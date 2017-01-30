@@ -20,8 +20,8 @@ import numpy as np
 class CommaAiPipeline(AbstractPipeline):
 
     def __init__(self):
-        self.input_shape = (128, 128, 3)
-        self.input_resize_to = (128, 128)
+        self.input_shape = (22, 64, 1)
+        self.input_resize_to = (64, 22)
 
 
     def get_train_samples(self, df):
@@ -47,15 +47,14 @@ class CommaAiPipeline(AbstractPipeline):
 
         # 1 in 10 images will be with augmented brightness
         toss = np.random.random()
-        if toss <= .1:
+        if toss <= .15:
           image_np = self.augment_brightness_camera_images(image_np)
 
         toss = np.random.random()
-        if toss <= .1:
+        if toss <= .15:
           image_np = self.add_random_shadow(image_np)
 
-#        image_np = self.rgb2gray(image_np)
-        image_np = self.normalize(image_np)
+        image_np = self.rgb2gray(image_np)
         return image_np
 
 
@@ -72,15 +71,20 @@ class CommaAiPipeline(AbstractPipeline):
 
         model.add(Lambda(lambda x: x/127.5 - 1.,
                     input_shape=self.input_shape))
-        model.add(Convolution2D(16, 8, 8, subsample=(4, 4), border_mode="same"))
+        model.add(Convolution2D(16, 5, 5, subsample=(2, 2), border_mode="same"))
         model.add(ELU())
-        model.add(Convolution2D(32, 5, 5, subsample=(2, 2), border_mode="same"))
+        model.add(Convolution2D(12, 3, 3, subsample=(1, 1), border_mode="same"))
+        model.add(MaxPooling2D((2, 2), border_mode='valid'))
         model.add(ELU())
-        model.add(Convolution2D(64, 5, 5, subsample=(2, 2), border_mode="same"))
+        model.add(Convolution2D(8, 3, 3, subsample=(1, 1), border_mode="same"))
         model.add(Flatten())
+        model.add(Dense(1024))
         model.add(Dropout(.2))
         model.add(ELU())
         model.add(Dense(512))
+        model.add(Dropout(.5))
+        model.add(ELU())
+        model.add(Dense(256))
         model.add(Dropout(.5))
         model.add(ELU())
         model.add(Dense(1))

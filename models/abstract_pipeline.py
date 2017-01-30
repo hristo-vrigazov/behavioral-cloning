@@ -27,7 +27,7 @@ class AbstractPipeline(object):
         raise NotImplementedError
 
     def get_weight(self, label):
-        return 1 #math.exp(abs(label) * 2)
+        return 1 #math.exp(abs(label))
 
     def path_driving_log(self, data_folder):
         return '{}/driving_log.csv'.format(data_folder)
