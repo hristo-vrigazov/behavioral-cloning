@@ -7,6 +7,7 @@ from sklearn.utils import shuffle
 from models.nvidia_pipeline import NvidiaPipeLine
 from models.vgg_pipeline import VGGPipeline
 from models.small_image_pipeline import SmallImagePipeline
+from models.comma_ai_pipeline import CommaAiPipeline
 
 from PIL import Image
 from utils import get_driving_log_dataframe
@@ -76,8 +77,6 @@ def train(data_folder, validation_folder, restart_model_path=None, train_generat
 
     if not train_generator:
         train_generator = pipeline.get_train_generator(data_folder, batch_size=BATCH_SIZE)
-    else:
-        samples = 96126
 
     model.summary()
 
@@ -106,6 +105,5 @@ if __name__ == "__main__":
         print('Usage: python model.py train_folder valid_folder [exising_model_to_finetune]')
     elif len(sys.argv) < 4:
         train(sys.argv[1], sys.argv[2])
-#        train(sys.argv[1], sys.argv[2], train_generator=get_preprocessed_dataframe('all_preprocessed', BATCH_SIZE))
     else:
         train(sys.argv[1], sys.argv[2], sys.argv[3])
