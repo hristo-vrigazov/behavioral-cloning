@@ -27,7 +27,7 @@ class AbstractPipeline(object):
         raise NotImplementedError
 
     def get_weight(self, label):
-        return 1 #math.exp(abs(label))
+        return 1#math.exp(abs(label))
 
     def path_driving_log(self, data_folder):
         return '{}/driving_log.csv'.format(data_folder)
@@ -66,7 +66,7 @@ class AbstractPipeline(object):
         return image
 
     def crop(self, image):
-        cropped_image = image[50:, :, :]
+        cropped_image = image[50:140, :, :]
         return cropped_image
 
     def resize(self, image, new_shape):

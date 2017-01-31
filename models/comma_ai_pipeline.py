@@ -46,9 +46,7 @@ class CommaAiPipeline(AbstractPipeline):
         image_np = self.resize(image_np, self.input_resize_to)
 
         # 1 in 10 images will be with augmented brightness
-        toss = np.random.random()
-        if toss <= .15:
-          image_np = self.augment_brightness_camera_images(image_np)
+        self.augment_brightness_camera_images(image_np)
 
         toss = np.random.random()
         if toss <= .15:
@@ -69,23 +67,18 @@ class CommaAiPipeline(AbstractPipeline):
     def get_model(self):
         model = Sequential()
 
-        model.add(Lambda(lambda x: x/127.5 - 1.,
+        model.add(Lambda(lambda x: x/255.0 - 0.5,
                     input_shape=self.input_shape))
-        model.add(Convolution2D(16, 5, 5, subsample=(2, 2), border_mode="same"))
-        model.add(ELU())
-        model.add(Convolution2D(12, 3, 3, subsample=(1, 1), border_mode="same"))
-        model.add(MaxPooling2D((2, 2), border_mode='valid'))
+        model.add(Convolution2D(16, 3, 3, subsample=(2, 2), border_mode="same"))
         model.add(ELU())
         model.add(Convolution2D(8, 3, 3, subsample=(1, 1), border_mode="same"))
+        model.add(MaxPooling2D((2, 2), border_mode='valid'))
+        model.add(ELU())
+        model.add(Convolution2D(4, 3, 3, subsample=(1, 1), border_mode="same"))
         model.add(Flatten())
-        model.add(Dense(1024))
         model.add(Dropout(.2))
-        model.add(ELU())
         model.add(Dense(512))
-        model.add(Dropout(.5))
-        model.add(ELU())
-        model.add(Dense(256))
-        model.add(Dropout(.5))
+        model.add(Dropout(.4))
         model.add(ELU())
         model.add(Dense(1))
 
