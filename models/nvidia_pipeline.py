@@ -5,6 +5,7 @@ from keras.layers import Convolution2D
 from keras.layers import Flatten
 from keras.layers import Dropout
 from keras.layers import Lambda
+from keras.layers.advanced_activations import ELU
 
 from .abstract_pipeline import AbstractPipeline
 
@@ -15,8 +16,8 @@ import numpy as np
 class NvidiaPipeLine(AbstractPipeline):
 
     def __init__(self):
-        self.input_shape = (60, 80, 3)
-        self.input_resize_to = (80, 60)
+        self.input_shape = (90, 320, 3)
+        self.input_resize_to = (320, 90)
 
 
     def get_train_samples(self, df):
@@ -61,39 +62,40 @@ class NvidiaPipeLine(AbstractPipeline):
         model.add(Lambda(lambda x: x/255.0,
                     input_shape=self.input_shape))
         model.add(Convolution2D(24, 
-                                3, 3,
+                                5, 5,
                                subsample=(2, 2),
-                               init='he_normal',
-                               W_regularizer=l2(regularization_coef), activity_regularizer=activity_l2(regularization_coef)))
-        model.add(BatchNormalization())
+                               init='he_normal'))
+        model.add(ELU())
         model.add(Convolution2D(36, 
-                                3, 3,
+                                5, 5,
                                subsample=(2, 2),
-                               init='he_normal',
-                               W_regularizer=l2(regularization_coef), activity_regularizer=activity_l2(regularization_coef)))
+                               init='he_normal'))
+        model.add(ELU())
         model.add(BatchNormalization())
         model.add(Convolution2D(48, 
-                                3, 3,
+                                5, 5,
                                subsample=(2, 2),
-                               init='he_normal',
-                               W_regularizer=l2(regularization_coef), activity_regularizer=activity_l2(regularization_coef)))
+                               init='he_normal'))
+        model.add(ELU())
         model.add(BatchNormalization())
         model.add(Dropout(0.2))
         model.add(Convolution2D(64,
                                3, 3,
-                               init='he_normal',
-                               W_regularizer=l2(regularization_coef), activity_regularizer=activity_l2(regularization_coef)))
+                               init='he_normal'))
+        model.add(ELU())
         model.add(BatchNormalization())
         model.add(Dropout(0.3))
         model.add(Convolution2D(64,
                                3, 3,
-                               init='he_normal',
-                               W_regularizer=l2(regularization_coef), activity_regularizer=activity_l2(regularization_coef)))
+                               init='he_normal'))
+        model.add(ELU())
         model.add(BatchNormalization())
         model.add(Dropout(0.4))
         model.add(Flatten())
         model.add(Dense(100, activation='relu', init='he_normal'))
+        model.add(BatchNormalization())
         model.add(Dense(50, activation='relu', init='he_normal'))
+        model.add(BatchNormalization())
         model.add(Dense(10, activation='relu', init='he_normal'))
         model.add(Dense(1, init='he_normal'))
 
