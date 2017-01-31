@@ -19,7 +19,7 @@ from keras.models import load_model
 pipeline = NvidiaPipeLine()
 
 BATCH_SIZE = 16
-EPOCHS = 5
+EPOCHS = 1
 
 def preprocess(image):
     return pipeline.preprocess_image(image)
