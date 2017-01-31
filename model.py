@@ -16,10 +16,10 @@ from keras.models import load_model
 # Instead of implementing here, the model is in the
 # models/ directory, because this allows to quickly
 # switch between different pipelines
-pipeline = CommaAiPipeline()
+pipeline = NvidiaPipeLine()
 
 BATCH_SIZE = 16
-EPOCHS = 1
+EPOCHS = 5
 
 def preprocess(image):
     return pipeline.preprocess_image(image)

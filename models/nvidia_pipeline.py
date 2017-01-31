@@ -29,15 +29,12 @@ class NvidiaPipeLine(AbstractPipeline):
 
 
     def preprocess_image(self, image):
-        # image = image.convert('YCbCr')
+        image = image.convert('YCbCr')
         image_np = np.asarray(image)
         image_np = self.crop(image_np)
         image_np = self.resize(image_np, self.input_resize_to)
 
-        # 1 in 4 images will be with augmented brightness
-        toss = np.random.random()
-        if toss <= .25:
-          image_np = self.augment_brightness_camera_images(image_np)
+        image_np = self.augment_brightness_camera_images(image_np)
 
         toss = np.random.random()
         if toss <= .25:
