@@ -6,6 +6,7 @@ from keras.layers import Flatten
 from keras.layers import Dropout
 from keras.layers import Lambda
 from keras.layers import Activation
+from keras.layers import MaxPooling2D
 from keras.layers.advanced_activations import ELU
 
 from .abstract_pipeline import AbstractPipeline
@@ -17,12 +18,12 @@ import numpy as np
 class NvidiaPipeLine(AbstractPipeline):
 
     def __init__(self):
-        self.input_shape = (66, 200, 3)
-        self.input_resize_to = (200, 66)
+        self.input_shape = (64, 64, 3)
+        self.input_resize_to = (64, 64)
 
 
     def get_train_samples(self, df):
-        return len(df) * 3 * 2
+        return len(df) * 3 * 4
 
 
     def get_validation_samples(self, df):
@@ -34,12 +35,6 @@ class NvidiaPipeLine(AbstractPipeline):
         image_np = np.asarray(image)
         image_np = self.crop(image_np)
         image_np = self.resize(image_np, self.input_resize_to)
-
-        image_np = self.augment_brightness_camera_images(image_np)
-
-        toss = np.random.random()
-        if toss <= .25:
-          image_np = self.add_random_shadow(image_np)
 
         return image_np
 
@@ -55,20 +50,33 @@ class NvidiaPipeLine(AbstractPipeline):
     def get_model(self):
         model = Sequential()
 
-        model.add(Lambda(lambda x: x/255 - .5, input_shape=self.input_shape))
-        
-        model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode='valid'))
+        model.add(Lambda(lambda x: x / 127.5 - 1.0, input_shape=(64, 64, 3)))
+
+        # starts with five convolutional and maxpooling layers
+        model.add(Convolution2D(24, 5, 5, border_mode='same', subsample=(2, 2)))
         model.add(Activation('relu'))
-        model.add(Convolution2D(36, 5, 5, subsample=(2, 2), border_mode='valid'))
+        model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
+        model.add(Convolution2D(36, 5, 5, border_mode='same', subsample=(2, 2)))
         model.add(Activation('relu'))
-        model.add(Convolution2D(48, 5, 5, subsample=(2, 2), border_mode='valid'))
+        model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
+        model.add(Convolution2D(48, 5, 5, border_mode='same', subsample=(2, 2)))
         model.add(Activation('relu'))
-        model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode='valid'))
+        model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
+        model.add(Convolution2D(64, 3, 3, border_mode='same', subsample=(1, 1)))
         model.add(Activation('relu'))
-        model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode='valid'))
+        model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
+        model.add(Convolution2D(64, 3, 3, border_mode='same', subsample=(1, 1)))
+        model.add(Activation('relu'))
+        model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
         model.add(Flatten())
-        model.add(Dropout(.5))
+
+        # Next, five fully connected layers
+        model.add(Dense(1164))
         model.add(Activation('relu'))
 
         model.add(Dense(100))
@@ -79,7 +87,7 @@ class NvidiaPipeLine(AbstractPipeline):
 
         model.add(Dense(10))
         model.add(Activation('relu'))
-        
+
         model.add(Dense(1))
 
         return model

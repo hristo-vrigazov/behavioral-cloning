@@ -41,15 +41,8 @@ class CommaAiPipeline(AbstractPipeline):
 
     def preprocess_image(self, image):
         image_np = np.asarray(image)
-
-        self.augment_brightness_camera_images(image_np)
-
-        toss = np.random.random()
-        if toss <= .15:
-          image_np = self.add_random_shadow(image_np)
-
         return image_np
-
+        
 
     def get_train_generator(self, data_folder, batch_size=64):
         return self.get_left_center_right_generator(data_folder, batch_size)

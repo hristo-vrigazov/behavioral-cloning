@@ -15,7 +15,7 @@ driving_log_df = get_driving_log_dataframe(directory)
 
 steering = driving_log_df['steering']
 
-angle_offset = 0.25
+angle_offset = 0.3
 
 # if image_column == 'left':
 #     delta_steering = -angle_offset

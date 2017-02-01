@@ -6,6 +6,9 @@ import math
 from PIL import Image
 from sklearn.utils import shuffle
 
+
+from scipy.ndimage import rotate
+
 class AbstractPipeline(object):
 
     def get_model(self):
@@ -32,6 +35,7 @@ class AbstractPipeline(object):
     def path_driving_log(self, data_folder):
         return '{}/driving_log.csv'.format(data_folder)
 
+
     # Credits to 
     # https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.xneaoqiwj
     def augment_brightness_camera_images(self, image):
@@ -40,6 +44,12 @@ class AbstractPipeline(object):
         image1[:,:,2] = image1[:,:,2]*random_bright
         image1 = cv2.cvtColor(image1,cv2.COLOR_HSV2RGB)
         return image1
+
+
+    def random_rotation(self, image, steering_angle, rotation_amount=15):
+        angle = np.random.uniform(-rotation_amount, rotation_amount + 1)
+        rad = (np.pi / 180.0) * angle
+        return rotate(image, angle, reshape=False), steering_angle + (-1) * rad
 
     # Credits to 
     # https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.xneaoqiwj
@@ -66,7 +76,7 @@ class AbstractPipeline(object):
         return image
 
     def crop(self, image):
-        cropped_image = image[50:140, :, :]
+        cropped_image = image[55:135, :, :]
         return cropped_image
 
     def resize(self, image, new_shape):
@@ -75,6 +85,16 @@ class AbstractPipeline(object):
     def get_driving_log_dataframe(self, data_folder):
         driving_log_df = pd.read_csv(self.path_driving_log(data_folder))
         return driving_log_df
+
+
+    def generate_additional_image(self, image_np, label):
+        toss = np.random.randint(0, 3)
+        if toss == 0:
+            return self.augment_brightness_camera_images(image_np), label
+        elif toss == 1:
+            return self.random_rotation(image_np, label)
+        elif toss == 2:
+            return self.add_random_shadow(image_np), label
 
     # generator for dataframes that have left, center and right
     # as opposed to
@@ -90,7 +110,7 @@ class AbstractPipeline(object):
         index_in_batch = 0
         batch_number = 0
         
-        angle_offset = 0.2
+        angle_offset = 0.3
         
         while True:
             for image_column in image_columns:
@@ -128,7 +148,18 @@ class AbstractPipeline(object):
                         X_train.append(flipped_image)
                         y_train.append(flipped_label)
                         weights.append(self.get_weight(flipped_label))
-                    
+
+                        # generate additional image
+                        X_augmented, y_augmented = self.generate_additional_image(image_np, label)
+                        X_train.append(X_augmented)
+                        y_train.append(y_augmented)
+                        weights.append(self.get_weight(y_augmented))
+
+                        X_augmented, y_augmented = self.generate_additional_image(flipped_image, flipped_label)
+                        X_train.append(X_augmented)
+                        y_train.append(y_augmented)
+                        weights.append(self.get_weight(y_augmented))
+
                         
                     X_train, y_train, weights = shuffle(X_train, y_train, weights)
                     yield np.array(X_train), np.array(y_train), np.array(weights)
@@ -147,7 +178,7 @@ class AbstractPipeline(object):
         index_in_batch = 0
         batch_number = 0
         
-        angle_offset = 0.2
+        angle_offset = 0.3
         
         while True:
             image_series = driving_log_df['center']
@@ -180,3 +211,6 @@ class AbstractPipeline(object):
 
                 X_train, y_train, weights = shuffle(X_train, y_train, weights)
                 yield np.array(X_train), np.array(y_train), np.array(weights)
+
+    def get_generator_cleaned(self, data_folder, batch_size=64):
+        pass

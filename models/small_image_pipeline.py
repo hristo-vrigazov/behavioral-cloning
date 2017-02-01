@@ -20,8 +20,8 @@ import numpy as np
 class SmallImagePipeline(AbstractPipeline):
 
     def __init__(self):
-        self.input_shape = (64, 42, 3)
-        self.input_resize_to = (42, 64)
+        self.input_shape = (64, 64, 3)
+        self.input_resize_to = (64, 64)
 
 
     def get_train_samples(self, df):
@@ -33,7 +33,7 @@ class SmallImagePipeline(AbstractPipeline):
         return grayed
 
     def normalize(self, img):
-        return img / (255.0 / 2) - 1
+        return img / 127.5 - 1
 
 
     def get_validation_samples(self, df):
@@ -44,17 +44,6 @@ class SmallImagePipeline(AbstractPipeline):
         image_np = np.asarray(image)
         image_np = self.crop(image_np)
         image_np = self.resize(image_np, self.input_resize_to)
-
-        # 1 in 4 images will be with augmented brightness
-        toss = np.random.random()
-        if toss <= .25:
-          image_np = self.augment_brightness_camera_images(image_np)
-
-        toss = np.random.random()
-        if toss <= .25:
-          image_np = self.add_random_shadow(image_np)
-
-#        image_np = self.rgb2gray(image_np)
         image_np = self.normalize(image_np)
         return image_np
 
@@ -73,7 +62,7 @@ class SmallImagePipeline(AbstractPipeline):
         model.add(Convolution2D(16, 5, 5, input_shape=self.input_shape, subsample=(2, 2), border_mode="same"))
         model.add(ELU())
 
-        model.add(Convolution2D(16, 3, 3, subsample=(1, 1), border_mode="valid"))
+        model.add(Convolution2D(32, 3, 3, subsample=(1, 1), border_mode="valid"))
         model.add(ELU())
         model.add(Dropout(.5))
         model.add(MaxPooling2D((2, 2), border_mode='valid'))
