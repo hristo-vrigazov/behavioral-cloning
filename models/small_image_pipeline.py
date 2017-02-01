@@ -25,7 +25,7 @@ class SmallImagePipeline(AbstractPipeline):
 
 
     def get_train_samples(self, df):
-        return len(df) * 3 * 2
+        return len(df) * 4
 
 
     def rgb2gray(self, img):
@@ -44,7 +44,6 @@ class SmallImagePipeline(AbstractPipeline):
         image_np = np.asarray(image)
         image_np = self.crop(image_np)
         image_np = self.resize(image_np, self.input_resize_to)
-        image_np = self.normalize(image_np)
         return image_np
 
 
@@ -58,6 +57,8 @@ class SmallImagePipeline(AbstractPipeline):
 
     def get_model(self):
         model = Sequential()
+
+        model.add(Lambda(lambda x: x / 127.5 - 1.0, input_shape=(64, 64, 3)))
 
         model.add(Convolution2D(16, 5, 5, input_shape=self.input_shape, subsample=(2, 2), border_mode="same"))
         model.add(ELU())
@@ -77,10 +78,8 @@ class SmallImagePipeline(AbstractPipeline):
         model.add(Dropout(.3))
         model.add(ELU())
 
-    # layer 5
         model.add(Dense(512))
         model.add(ELU())
 
-    # Finally a single output, since this is a regression problem
         model.add(Dense(1))
         return model

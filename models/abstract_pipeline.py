@@ -88,12 +88,10 @@ class AbstractPipeline(object):
 
 
     def generate_additional_image(self, image_np, label):
-        toss = np.random.randint(0, 3)
+        toss = np.random.randint(0, 2)
         if toss == 0:
             return self.augment_brightness_camera_images(image_np), label
         elif toss == 1:
-            return self.random_rotation(image_np, label)
-        elif toss == 2:
             return self.add_random_shadow(image_np), label
 
     # generator for dataframes that have left, center and right
