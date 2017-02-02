@@ -1,3 +1,5 @@
+# See models/nvidia_pipeline.py for the model architecture
+
 import sys
 import cv2
 import pandas as pd
