@@ -122,7 +122,12 @@ class AbstractPipeline(object):
                     end_of_batch = min(number_of_examples, offset + batch_size)
 
                     for j in range(offset, end_of_batch):
-                        image_filename = image_series[j].lstrip().rstrip()
+                        try:
+                            image_filename = image_series[j].lstrip().rstrip()
+                        except:
+                            print(j)
+                            print(image_series[j])
+                            continue
                         
                         image = Image.open('{0}/{1}'.format(data_folder, image_filename))
                         image_np = self.preprocess_image(image)

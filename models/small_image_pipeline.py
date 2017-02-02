@@ -25,7 +25,7 @@ class SmallImagePipeline(AbstractPipeline):
 
 
     def get_train_samples(self, df):
-        return len(df) * 4
+        return (len(df) - 1) * 4
 
 
     def rgb2gray(self, img):
