@@ -23,7 +23,7 @@ class NvidiaPipeLine(AbstractPipeline):
 
 
     def get_train_samples(self, df):
-        return len(df) * 3 * 4
+        return len(df) * 4
 
 
     def get_validation_samples(self, df):
@@ -40,7 +40,7 @@ class NvidiaPipeLine(AbstractPipeline):
 
 
     def get_train_generator(self, data_folder, batch_size=64):
-        return self.get_left_center_right_generator(data_folder, batch_size)
+        return self.get_center_only_generator(data_folder, batch_size)
 
 
     def get_validation_generator(self, data_folder, batch_size=64):
@@ -78,9 +78,11 @@ class NvidiaPipeLine(AbstractPipeline):
         # Next, five fully connected layers
         model.add(Dense(1164))
         model.add(Activation('relu'))
+        model.add(Dropout(0.3))
 
         model.add(Dense(100))
         model.add(Activation('relu'))
+        model.add(Dropout(0.4))
 
         model.add(Dense(50))
         model.add(Activation('relu'))

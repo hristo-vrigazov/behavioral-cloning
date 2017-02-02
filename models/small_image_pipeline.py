@@ -48,7 +48,7 @@ class SmallImagePipeline(AbstractPipeline):
 
 
     def get_train_generator(self, data_folder, batch_size=64):
-        return self.get_left_center_right_generator(data_folder, batch_size)
+        return self.get_center_only_generator(data_folder, batch_size)
 
 
     def get_validation_generator(self, data_folder, batch_size=64):
