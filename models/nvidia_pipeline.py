@@ -65,6 +65,7 @@ class NvidiaPipeLine(AbstractPipeline):
 
         model = Sequential()
 
+        # normalization layer
         model.add(Lambda(lambda x: x / 127.5 - 1.0, input_shape=self.input_shape))
 
         model.add(Convolution2D(24, 5, 5, border_mode='same', subsample=(2, 2)))
