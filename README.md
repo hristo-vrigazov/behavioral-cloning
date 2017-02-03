@@ -53,5 +53,9 @@ did not position itself in the center, and then comes back.
 The model was trained with Adam as optimizer, with default learning rate and mean squared error.
 I also recorded a separate validation dataset, which consisted of one full lap on the track. 
 Images with augmentated brightness and random shadows were generated  in the training data generator on the fly.
+
+
 ![Recover](example_recover.jpg "-0.1")
+
+
 ![Recover](example_recover2.jpg "-0.6667")
