@@ -36,3 +36,22 @@ I then recorded data intentionally with mostly images of recovery, about 11000 o
 and finetuned Nvidia's model on them. It made a significant improvement in both validation
 accuracy and the overall behavior of the model. After adding dropout, the model was able to
 navigate safely through the track.
+
+## Model architecture
+
+The final model takes a 64x64x3 input image, performs normalization on it, and then has
+2 convolutional layers with 5x5 convolution with 2x2 subsampling, then 3 convolutional
+layers with 3x3 filter size, then fully connected part, in which we have Dropout.
+
+![Final model](model.png "The final model")
+
+## Training dataset
+
+I used my own recorded recover data, to teach the model how to recover when he does wrong,
+as well as Udacity's data. The recovery data consists of different situations when the car
+did not position itself in the center, and then comes back.
+The model was trained with Adam as optimizer, with default learning rate and mean squared error.
+I also recorded a separate validation dataset, which consisted of one full lap on the track. 
+Images with augmentated brightness and random shadows were generated  in the training data generator on the fly.
+![Recover](example_recover.jpg "-0.1")
+![Recover](example_recover2.jpg "-0.6667")
